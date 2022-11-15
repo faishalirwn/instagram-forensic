@@ -7,6 +7,7 @@ from mdutils.mdutils import MdUtils
 from mdutils import Html
 import json
 import xml.etree.ElementTree as ET
+import shutil
 
 def getProp(prop):
     cmd = "adb shell getprop " + prop
@@ -60,9 +61,10 @@ pullFile("shared_prefs/com.instagram.android_preferences.xml", current_path)
 pullFile("databases/direct.db", current_path)
 pullFile("cache/images.stash/clean", current_path)
 
-os.makedirs(current_path/"processed"/"clean")
-for filename in os.listdir(current_path/"clean"):
-    os.rename(current_path/"clean"/filename, current_path/"processed"/"clean"/f"{filename}.jpg")
+processed_path = current_path/"processed"/"clean"
+shutil.copytree(current_path/"clean", processed_path)
+for filename in os.listdir(processed_path):
+    os.rename(processed_path/filename, processed_path/f"{filename}.jpg")
 
 root = ET.parse(current_path/'com.instagram.android_preferences.xml').getroot()
 
@@ -174,7 +176,7 @@ for i, thread in enumerate(threads):
 
 mdFile.new_header(level=1, title='Images')
 
-for file in os.listdir(current_path/"processed"/"clean"):
+for file in os.listdir(processed_path):
      filename = os.fsdecode(file)
      mdFile.new_paragraph(Html.image(path=f"./processed/clean/{filename}", size='200'))
 
