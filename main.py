@@ -40,6 +40,9 @@ answer = input("Do you want to continue? (y/n): ")
 
 if answer != "y":
     exit()
+elif not getProp("service.adb.root"):
+    print("Your device is not rooted.")
+    exit()
 
 investigator = {}
 
