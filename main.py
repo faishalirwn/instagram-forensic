@@ -21,6 +21,31 @@ def getPackageInfo(prop):
 def pullFile(path, _cwd):
     subprocess.run(f"adb pull /data/data/com.instagram.android/{path}", cwd=_cwd)
 
+print("""
+  _____           _                                    ______                       _      
+ |_   _|         | |                                  |  ____|                     (_)     
+   | |  _ __  ___| |_ __ _  __ _ _ __ __ _ _ __ ___   | |__ ___  _ __ ___ _ __  ___ _  ___ 
+   | | | '_ \/ __| __/ _` |/ _` | '__/ _` | '_ ` _ \  |  __/ _ \| '__/ _ \ '_ \/ __| |/ __|
+  _| |_| | | \__ \ || (_| | (_| | | | (_| | | | | | | | | | (_) | | |  __/ | | \__ \ | (__ 
+ |_____|_| |_|___/\__\__,_|\__, |_|  \__,_|_| |_| |_| |_|  \___/|_|  \___|_| |_|___/_|\___|
+                            __/ |                                                          
+                           |___/                                                           
+Note: Make sure your device is rooted and connected to your computer.
+This application will extract important instagram data from your device, create a report, and save them in 'result' directory.
+""")
+
+print("Press y to continue or any other key to exit.")
+answer = input("Do you want to continue? (y/n): ")
+
+if answer != "y":
+    exit()
+
+investigator = {}
+
+investigator["name"] = input("\nInvestigator Name: ")
+investigator["email"] = input("Investigator Email: ")
+investigator["phone"] = input("Investigator Phone Number: ")
+
 device_name = getProp("ro.product.manufacturer").capitalize() + " " + getProp("ro.product.model")
 
 result_path = pathlib.Path(__file__).parent.resolve()/"result"
@@ -102,6 +127,16 @@ device_info = [
 
 mdFile.new_table(columns=2, rows=7, text=device_info, text_align='left')
 
+mdFile.new_header(level=1, title='Investigator Information')
+
+device_info = [
+    "Investigator Name", investigator["name"],
+    "Investigator Email", investigator["email"],
+    "Investigator Phone Number", investigator["phone"]
+]
+
+mdFile.new_table(columns=2, rows=3, text=device_info, text_align='left')
+
 mdFile.new_header(level=1, title='Instagram Information')
 
 instagram_info = [
@@ -147,6 +182,10 @@ mdFile.new_table_of_contents(table_title='Contents', depth=2)
 
 os.chdir(current_path)
 mdFile.create_md_file()
+
+print(f"""
+Extracted files and report (Result.md) saved to {current_path
+}""")
 
 # ============================== CLI Version ==============================
 
