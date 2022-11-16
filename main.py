@@ -7,6 +7,7 @@ from mdutils.mdutils import MdUtils
 import json
 import xml.etree.ElementTree as ET
 import shutil
+import hashlib
 
 def getProp(prop):
     cmd = "adb shell getprop " + prop
@@ -183,12 +184,25 @@ mdFile.new_table_of_contents(table_title='Contents', depth=2)
 os.chdir(current_path)
 mdFile.create_md_file()
 
+hashes = {}
+
+for i, file in enumerate(os.listdir(current_path/"clean")):
+    md5 = hashlib.md5()
+    with open(current_path/"clean"/file, 'rb') as f:
+        while True:
+            data = f.read(65536)
+            if not data:
+                break
+            md5.update(data)
+    hashes[file] = md5.hexdigest()
+
 with open(current_path/"Result.md", "a") as f:
     f.write("\n<table>\n<tbody>\n")
     for i, file in enumerate(os.listdir(current_path/"clean")):
         filename = os.fsdecode(file)
         f.write("<tr>\n" if i == 0 else "")
-        f.write(f"<td align='center'><img src='./processed/clean/{filename}.jpg' width='200px;'/><br /><sub><b>{filename}</b></sub></td>\n")
+        file_hash = hashes[filename]
+        f.write(f"<td align='center'><img src='./processed/clean/{filename}.jpg' width='200px;'/><br /><sub><b>{filename}</b></sub><br /><sub><b>MD5: {file_hash}</b></sub></td>\n")
         f.write("\n</tr>" if i % 5 == 0 and i != 0 else "")
         f.write("\n<tr>" if i % 5 == 0 and i != 0 else "")
         f.write("\n</tr>" if i == len(os.listdir(current_path/"clean")) - 1 else "")
