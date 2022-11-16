@@ -4,7 +4,6 @@ import pathlib
 import os
 from datetime import datetime
 from mdutils.mdutils import MdUtils
-from mdutils import Html
 import json
 import xml.etree.ElementTree as ET
 import shutil
@@ -179,14 +178,21 @@ for i, thread in enumerate(threads):
 
 mdFile.new_header(level=1, title='Images')
 
-for file in os.listdir(processed_path):
-     filename = os.fsdecode(file)
-     mdFile.new_paragraph(Html.image(path=f"./processed/clean/{filename}", size='200'))
-
 mdFile.new_table_of_contents(table_title='Contents', depth=2)
 
 os.chdir(current_path)
 mdFile.create_md_file()
+
+with open(current_path/"Result.md", "a") as f:
+    f.write("\n<table>\n<tbody>\n")
+    for i, file in enumerate(os.listdir(current_path/"clean")):
+        filename = os.fsdecode(file)
+        f.write("<tr>\n" if i == 0 else "")
+        f.write(f"<td align='center'><img src='./processed/clean/{filename}.jpg' width='200px;'/><br /><sub><b>{filename}</b></sub></td>\n")
+        f.write("\n</tr>" if i % 5 == 0 and i != 0 else "")
+        f.write("\n<tr>" if i % 5 == 0 and i != 0 else "")
+        f.write("\n</tr>" if i == len(os.listdir(current_path/"clean")) - 1 else "")
+    f.write("\n</tbody>\n</table>\n")
 
 print(f"""
 Extracted files and report (Result.md) saved to {current_path
